@@ -6,7 +6,7 @@ def fix_days_employed_anomaly(df: pd.DataFrame) -> pd.DataFrame:
     Creates a flag column before replacing the placeholder with NaN.
     '''
     df = df.copy()
-    ANOMALY_VALUE = 356243
-    df['DAYS_EMPLOYED_ANM'] = df['DAYS_EMPLOYED'] == ANOMALY_VALUE
+    ANOMALY_VALUE = 365243
+    df['DAYS_EMPLOYED_ANOM'] = df['DAYS_EMPLOYED'] == ANOMALY_VALUE
     df['DAYS_EMPLOYED'] = df['DAYS_EMPLOYED'].replace(ANOMALY_VALUE , pd.NA)
     return df
