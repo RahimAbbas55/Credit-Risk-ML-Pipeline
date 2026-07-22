@@ -23,3 +23,27 @@ def cap_income_anomaly(df: pd.DataFrame , cap_percentile: float = 0.99) -> pd.Da
     cap_value = df['AMT_INCOME_TOTAL'].quantile(cap_percentile)
     df['AMT_INCOME_TOTAL'] = df['AMT_INCOME_TOTAL'].clip(upper = cap_value)
     return df
+
+# Function to handle the missing value in the dataset
+def handle_missing_values(df: pd.DataFrame) -> pd.DataFrame:
+    '''
+    Handle missing values using different strategies based on column type
+    and reason for missingness.
+    '''
+    df = df.copy()
+    # OWN_CAR_AGE: missing means no car.(structural missingness)
+    df['OWN_CAR_AGE'] = df['OWN_CAR_AGE'].fillna(0)
+    
+    # Numeric columns: fill with median
+    numeric_cols = df.select_dtypes(include = ['float64', 'int64']).columns
+    for col in numeric_cols:
+        if df[col].isnull().sum() > 0:
+           df[col] = df[col].fillna(df[col].median())
+    
+    # Categorical columns: fill with 'Unknown' instead of dropping
+    categorical_cols = df.select_dtypes(include = ['object']).columns
+    for col in categorical_cols:
+        if df[col].isnull().sum() > 0:
+            df[col] = df[col].fillna('Unknown')
+    
+    return df
