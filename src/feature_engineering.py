@@ -9,4 +9,5 @@ def fix_days_employed_anomaly(df: pd.DataFrame) -> pd.DataFrame:
     ANOMALY_VALUE = 365243
     df['DAYS_EMPLOYED_ANOM'] = df['DAYS_EMPLOYED'] == ANOMALY_VALUE
     df['DAYS_EMPLOYED'] = df['DAYS_EMPLOYED'].replace(ANOMALY_VALUE , pd.NA)
+    df['DAYS_EMPLOYED'] = pd.to_numeric(df['DAYS_EMPLOYED'], errors='coerce')
     return df
