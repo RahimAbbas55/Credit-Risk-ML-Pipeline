@@ -45,5 +45,16 @@ def handle_missing_values(df: pd.DataFrame) -> pd.DataFrame:
     for col in categorical_cols:
         if df[col].isnull().sum() > 0:
             df[col] = df[col].fillna('Unknown')
-    
+            
+    return df
+
+# Wrapper function to call all functions in sequence 
+def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
+    '''
+    un the full feature engineering pipeline: fix anomalies,
+    cap outliers, and handle missing values.
+    '''
+    df = fix_days_employed_anomaly(df)
+    df = cap_income_anomaly(df)
+    df = handle_missing_values(df)
     return df
