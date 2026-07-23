@@ -88,3 +88,13 @@ def build_previous_application_features(previous_application: pd.DataFrame) -> p
         PREV_APP_DAYS_DECISION_MEAN=('DAYS_DECISION', 'mean'),
     ).reset_index()
     return agg
+
+# Function to left-join bureau and previous_application aggregated features onto the main application table using SK_ID_CURR.
+def merge_all_features(
+    application: pd.DataFrame,
+    bureau_features: pd.DataFrame,
+    previous_application_features: pd.DataFrame    
+) -> pd.DataFrame:
+    df = application.merge(bureau_features , on = 'SK_ID_CURR' , how = 'left')
+    df = df.merge(previous_application_features , on = 'SK_ID_CURR' , how = 'left')
+    return df
