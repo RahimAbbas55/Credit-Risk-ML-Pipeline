@@ -73,3 +73,18 @@ def aggregate_bureau_data(bureau: pd.DataFrame) -> pd.DataFrame:
         BUREAU_CNT_CREDIT_PROLONG_SUM=('CNT_CREDIT_PROLONG', 'sum'),
     ).reset_index()
     return agg
+
+# Function to aggregate previous_application.csv data into 1 row per SK_ID_CURR
+def build_previous_application_features(previous_application: pd.DataFrame) -> pd.DataFrame:
+    previous_application = previous_application.copy()
+    previous_application['IS_APPROVED'] = (previous_application['NAME_CONTRACT_STATUS'] == 'Approved').astype(int)
+    previous_application['IS_REFUSED'] = (previous_application['NAME_CONTRACT_STATUS'] == 'Refused').astype(int)
+    agg = previous_application.groupby('SK_ID_CURR').agg(
+        PREV_APP_COUNT=('SK_ID_PREV', 'count'),
+        PREV_APP_APPROVAL_RATE=('IS_APPROVED', 'mean'),
+        PREV_APP_REFUSAL_RATE=('IS_REFUSED', 'mean'),
+        PREV_APP_CREDIT_MEAN=('AMT_CREDIT', 'mean'),
+        PREV_APP_ANNUITY_MEAN=('AMT_ANNUITY', 'mean'),
+        PREV_APP_DAYS_DECISION_MEAN=('DAYS_DECISION', 'mean'),
+    ).reset_index()
+    return agg
