@@ -98,3 +98,25 @@ def merge_all_features(
     df = application.merge(bureau_features , on = 'SK_ID_CURR' , how = 'left')
     df = df.merge(previous_application_features , on = 'SK_ID_CURR' , how = 'left')
     return df
+
+# Handling new missing values and final verifications
+def fill_missing_history_features(df : pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+    history_cols = [col for col in df.columns if col.startswith('BUREAU_') or col.startswith('PREV_APP_')]
+    df[history_cols] = df[history_cols].fillna(0)
+    return df
+
+# Final feature engineering pipeline
+def engineer_features_pipeline(df: pd.DataFrame , bureau: pd.DataFrame , prev_app: pd.DataFrame) -> pd.DataFrame:
+    '''
+    Run the full feature engineering pipeline: fix anomalies, cap outliers, handle missing values, 
+    and merge bureau and previous application features.
+    '''
+    df = fix_days_employed_anomaly(df)
+    df = cap_income_anomaly(df)
+    bureau_features = aggregate_bureau_data(bureau)
+    prev_app_features = build_previous_application_features(prev_app)
+    df = merge_all_features(df , bureau_features , prev_app_features)
+    df = fill_missing_history_features(df)
+    df = handle_missing_values(df) 
+    return df  
