@@ -1,4 +1,5 @@
 import pandas as pd
+
 # Function to fix the "365243" anomaly in the DAYS_EMPLOYED column
 def fix_days_employed_anomaly(df: pd.DataFrame) -> pd.DataFrame:
     '''
@@ -58,3 +59,17 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     df = cap_income_anomaly(df)
     df = handle_missing_values(df)
     return df
+
+# Function to aggregate bureau.csv data into 1 row per SK_ID_CURR
+def aggregate_bureau_data(bureau: pd.DataFrame) -> pd.DataFrame:
+    agg = bureau.groupby('SK_ID_CURR').agg(
+        BUREAU_CREDIT_COUNT=('SK_ID_BUREAU', 'count'),
+        BUREAU_DAYS_CREDIT_MEAN=('DAYS_CREDIT', 'mean'),
+        BUREAU_CREDIT_SUM_MEAN=('AMT_CREDIT_SUM', 'mean'),
+        BUREAU_CREDIT_SUM_MAX=('AMT_CREDIT_SUM', 'max'),
+        BUREAU_CREDIT_SUM_DEBT_MEAN=('AMT_CREDIT_SUM_DEBT', 'mean'),
+        BUREAU_CREDIT_DAY_OVERDUE_MAX=('CREDIT_DAY_OVERDUE', 'max'),
+        BUREAU_CREDIT_MAX_OVERDUE_MEAN=('AMT_CREDIT_MAX_OVERDUE', 'mean'),
+        BUREAU_CNT_CREDIT_PROLONG_SUM=('CNT_CREDIT_PROLONG', 'sum'),
+    ).reset_index()
+    return agg
