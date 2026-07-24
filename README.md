@@ -26,6 +26,14 @@ Python · Pandas · NumPy · Scikit-learn · XGBoost · FastAPI · Docker · AWS
 - Merged everything onto the main table via left joins — zero applicants lost
 - Final dataset: 307,511 rows × 137 columns, 0 missing values
 
+**Day 4 — Baseline Model & Evaluation**
+- Encoded categorical features (one-hot, 249 total features) and split data with stratification to preserve class balance
+- Trained a baseline Logistic Regression model with `class_weight='balanced'` to address the imbalance
+- Evaluated using ROC-AUC, precision, recall, and F1 — not accuracy alone, given the class imbalance
+- **Results: ROC-AUC 0.754, Recall 0.68 (defaulters), Precision 0.16**
+- Saved model, scaler, and evaluation visualizations (ROC curve, confusion matrix) as reusable artifacts
+- Consolidated into a standalone `train.py` script — reproducible with one command
+
 ## Setup
 
 ```bash
@@ -39,8 +47,7 @@ pip install -r requirements.txt
 Data isn't included (size + licensing). Download from the [Kaggle competition page](https://www.kaggle.com/c/home-credit-default-risk) and place CSVs in `data/raw/`.
 
 ## What's next
-- Train/test split + baseline model
-- Model comparison (Logistic Regression, Random Forest, XGBoost)
-- Evaluation metrics & tuning
+- Model comparison (Random Forest, XGBoost) with cross-validation
+- Deeper evaluation and hyperparameter tuning
 - FastAPI prediction endpoint
 - Dockerize + deploy on AWS
