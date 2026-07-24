@@ -120,3 +120,14 @@ def engineer_features_pipeline(df: pd.DataFrame , bureau: pd.DataFrame , prev_ap
     df = fill_missing_history_features(df)
     df = handle_missing_values(df) 
     return df  
+
+# Function to perform hot encoding on categorical features
+def encode_categorical_features(X: pd.DataFrame) -> pd.DataFrame:
+    """
+    One-hot encode all categorical (object/string) columns.
+    Uses drop_first=True to avoid the dummy variable trap.
+    """
+    X = X.copy()
+    categorical_cols = X.select_dtypes(include = ['object' , 'str']).columns.tolist()
+    X_encoded = pd.get_dummies(X , columns  = categorical_cols , drop_first = True)
+    return X_encoded
