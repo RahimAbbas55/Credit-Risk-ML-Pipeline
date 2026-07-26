@@ -34,6 +34,14 @@ Python · Pandas · NumPy · Scikit-learn · XGBoost · FastAPI · Docker · AWS
 - Saved model, scaler, and evaluation visualizations (ROC curve, confusion matrix) as reusable artifacts
 - Consolidated into a standalone `train.py` script — reproducible with one command
 
+**Day 5 — Model Comparison & Selection**
+- Trained and compared three models: Logistic Regression, Random Forest, and XGBoost
+- Used 5-fold stratified cross-validation for a reliable, unbiased comparison (not just a single train/test split)
+- Found Logistic Regression and XGBoost statistically comparable on ROC-AUC (0.751 vs 0.748), with Random Forest clearly behind (0.736) due to a threshold/calibration issue despite similar ranking ability
+- Analyzed feature importance: `EXT_SOURCE_1/2/3` (external credit scores) and engineered bureau features dominated XGBoost; Logistic Regression coefficients showed multicollinearity issues (e.g. `AMT_CREDIT` vs `AMT_GOODS_PRICE`)
+- **Selected XGBoost as the final model** — comparable accuracy to Logistic Regression, more stable across folds, and more trustworthy feature importances
+- Refactored data prep into a single reusable function (`prepare_model_data()`), reducing duplication across notebooks and `train.py`
+
 ## Setup
 
 ```bash
@@ -47,7 +55,6 @@ pip install -r requirements.txt
 Data isn't included (size + licensing). Download from the [Kaggle competition page](https://www.kaggle.com/c/home-credit-default-risk) and place CSVs in `data/raw/`.
 
 ## What's next
-- Model comparison (Random Forest, XGBoost) with cross-validation
 - Deeper evaluation and hyperparameter tuning
 - FastAPI prediction endpoint
 - Dockerize + deploy on AWS
