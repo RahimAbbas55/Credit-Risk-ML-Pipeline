@@ -1,4 +1,6 @@
 import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 
 # Function to fix the "365243" anomaly in the DAYS_EMPLOYED column
 def fix_days_employed_anomaly(df: pd.DataFrame) -> pd.DataFrame:
@@ -131,3 +133,28 @@ def encode_categorical_features(X: pd.DataFrame) -> pd.DataFrame:
     categorical_cols = X.select_dtypes(include = ['object' , 'str']).columns.tolist()
     X_encoded = pd.get_dummies(X , columns  = categorical_cols , drop_first = True)
     return X_encoded
+
+# Function to prepare the data for modeling: separate target, encode categoricals, split, and scale
+def prepare_model_data(df: pd.DataFrame, test_size: float = 0.2, random_state: int = 42):
+    """
+    Full modeling prep: separate target, encode categoricals, split, and scale.
+
+    Returns:
+        X_train_scaled, X_test_scaled, y_train, y_test, scaler
+    """
+    y = df['TARGET']
+    X = df.drop(columns=['TARGET', 'SK_ID_CURR'])
+    X_encoded = encode_categorical_features(X)
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X_encoded, y,
+        test_size=test_size,
+        random_state=random_state,
+        stratify=y
+    )
+
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+
+    return X_train_scaled, X_test_scaled, y_train, y_test, scaler
