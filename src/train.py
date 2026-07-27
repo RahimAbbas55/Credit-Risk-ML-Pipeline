@@ -33,11 +33,16 @@ def train_final_model():
     print("Preparing model data...")
     X_train_scaled, X_test_scaled, y_train, y_test, scaler = prepare_model_data(df)
 
-    print("Training XGBoost (final model)...")
+    print("Training XGBoost (tuned, final model)...")
     scale_pos_weight = (y_train == 0).sum() / (y_train == 1).sum()
 
     model = XGBClassifier(
-        n_estimators=100,
+        n_estimators=300,
+        max_depth=4,
+        learning_rate=0.05,
+        subsample=0.8,
+        colsample_bytree=0.8,
+        min_child_weight=3,
         scale_pos_weight=scale_pos_weight,
         random_state=42,
         eval_metric='logloss',
@@ -57,7 +62,7 @@ def train_final_model():
     print("\nConfusion Matrix:\n", confusion_matrix(y_test, y_pred))
     print("\nClassification Report:\n", classification_report(y_test, y_pred))
 
-    joblib.dump(model, 'models/xgboost_best_model.joblib')
+    joblib.dump(model, 'models/xgboost_tuned_final.joblib')
     joblib.dump(scaler, 'models/scaler.joblib')
     print("\nModel and scaler saved to models/")
 
