@@ -42,6 +42,13 @@ Python · Pandas · NumPy · Scikit-learn · XGBoost · FastAPI · Docker · AWS
 - **Selected XGBoost as the final model** — comparable accuracy to Logistic Regression, more stable across folds, and more trustworthy feature importances
 - Refactored data prep into a single reusable function (`prepare_model_data()`), reducing duplication across notebooks and `train.py`
 
+**Day 6 — Hyperparameter Tuning**
+- Tuned XGBoost using `RandomizedSearchCV` with 3-fold cross-validation (20 candidate configurations, 60 total fits)
+- Best parameters favored a more regularized configuration: shallower trees (`max_depth=4`), more of them (`n_estimators=300`), lower learning rate (`0.05`), with row/column subsampling (`0.8`) — consistent with the baseline mildly overfitting
+- **Results on held-out test set: ROC-AUC 0.757 → 0.767, Recall 0.62 → 0.69** (small precision tradeoff: 0.183 → 0.172)
+- Tuning meaningfully improved default detection at a modest cost to false-positive rate — a reasonable tradeoff for a lender prioritizing risk detection
+- `train.py` updated with tuned hyperparameters as the final production configuration
+
 ## Setup
 
 ```bash
@@ -55,6 +62,5 @@ pip install -r requirements.txt
 Data isn't included (size + licensing). Download from the [Kaggle competition page](https://www.kaggle.com/c/home-credit-default-risk) and place CSVs in `data/raw/`.
 
 ## What's next
-- Deeper evaluation and hyperparameter tuning
 - FastAPI prediction endpoint
 - Dockerize + deploy on AWS
