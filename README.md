@@ -1,6 +1,6 @@
 # Credit Risk ML Pipeline
 
-End-to-end ML pipeline predicting loan default risk using the [Home Credit Default Risk](https://www.kaggle.com/c/home-credit-default-risk) dataset. Built as a proper pipeline — not just a notebook — with data ingestion, multi-table feature engineering, model training, and (soon) a served prediction API.
+End-to-end ML pipeline predicting loan default risk using the [Home Credit Default Risk](https://www.kaggle.com/c/home-credit-default-risk) dataset. Built as a proper pipeline — not just a notebook — with data ingestion, multi-table feature engineering, model training, and a served prediction API.
 
 > 🚧 Work in progress — this README will be expanded as the project develops.
 
@@ -49,6 +49,14 @@ Python · Pandas · NumPy · Scikit-learn · XGBoost · FastAPI · Docker · AWS
 - Tuning meaningfully improved default detection at a modest cost to false-positive rate — a reasonable tradeoff for a lender prioritizing risk detection
 - `train.py` updated with tuned hyperparameters as the final production configuration
 
+**Day 7 — FastAPI Prediction Endpoint & Dockerization**
+- Designed a practical API interface: rather than requiring callers to supply all 249 one-hot encoded model features, the API accepts ~15 human-meaningful fields (income, credit amount, age, education, external credit scores, etc.)
+- Built a feature defaults template (`feature_defaults.json`) from training data medians/modes, used to fill any fields not provided by the caller
+- Implemented `/predict` and `/health` endpoints with Pydantic request/response validation and auto-generated interactive docs
+- Verified end-to-end: full-input and minimal-input requests both produce correct, sensible predictions
+- Containerized the API with Docker for consistent, portable deployment
+- Caught and fixed a real dependency management gap: `fastapi`, `uvicorn`, and `xgboost` were installed locally but missing from `requirements.txt` — only surfaced when tested in Docker's clean environment
+
 ## Setup
 
 ```bash
@@ -61,6 +69,24 @@ pip install -r requirements.txt
 
 Data isn't included (size + licensing). Download from the [Kaggle competition page](https://www.kaggle.com/c/home-credit-default-risk) and place CSVs in `data/raw/`.
 
+## Training
+
+```bash
+python -m src.train
+```
+
+## Running the API
+
+```bash
+uvicorn api.main:app --reload
+```
+Visit `http://127.0.0.1:8000/docs` for interactive API documentation.
+
+Or via Docker:
+```bash
+docker build -t credit-risk-api .
+docker run -p 8000:8000 credit-risk-api
+```
+
 ## What's next
-- FastAPI prediction endpoint
-- Dockerize + deploy on AWS
+- Deploy to AWS
