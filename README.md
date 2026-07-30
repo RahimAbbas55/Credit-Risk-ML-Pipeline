@@ -57,6 +57,19 @@ Python · Pandas · NumPy · Scikit-learn · XGBoost · FastAPI · Docker · AWS
 - Containerized the API with Docker for consistent, portable deployment
 - Caught and fixed a real dependency management gap: `fastapi`, `uvicorn`, and `xgboost` were installed locally but missing from `requirements.txt` — only surfaced when tested in Docker's clean environment
 
+**Day 8 — AWS Deployment**
+- Pushed the Docker image to AWS ECR (Elastic Container Registry)
+- Deployed to a live EC2 instance, configured with proper security groups (SSH restricted to a known IP, API port open publicly)
+- Found and fixed a CPU architecture mismatch (image built for arm64, EC2 running amd64) causing `exec format error` crashes — rebuilt using `docker buildx --platform linux/amd64`
+- **API is live and publicly accessible**, verified via real HTTP requests from an external machine
+- Project complete: full pipeline from raw multi-table data to a live, deployed prediction API
+
+## Live API
+- Docs: `http://52.200.3.133:8000/docs`
+- Health check: `http://52.200.3.133:8000/health`
+
+> Note: this is a personal EC2 instance for portfolio/demo purposes and may not always be running.
+
 ## Setup
 
 ```bash
@@ -88,5 +101,7 @@ docker build -t credit-risk-api .
 docker run -p 8000:8000 credit-risk-api
 ```
 
-## What's next
-- Deploy to AWS
+## Possible future improvements
+- CI/CD via GitHub Actions (automated testing, linting)
+- Elastic IP for a stable, permanent address
+- HTTPS via a reverse proxy (e.g. Nginx + Let's Encrypt)
