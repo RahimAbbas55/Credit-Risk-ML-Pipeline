@@ -2,7 +2,7 @@
 
 End-to-end ML pipeline predicting loan default risk using the [Home Credit Default Risk](https://www.kaggle.com/c/home-credit-default-risk) dataset. Built as a proper pipeline — not just a notebook — with data ingestion, multi-table feature engineering, model training, and a served prediction API.
 
-> 🚧 Work in progress — this README will be expanded as the project develops.
+> ✅ Complete — a full end-to-end pipeline from raw multi-table data to a live, deployed prediction API.
 
 ## Stack
 Python · Pandas · NumPy · Scikit-learn · XGBoost · FastAPI · Docker · AWS
