@@ -1,11 +1,11 @@
 # Credit Risk ML Pipeline
 
-End-to-end ML pipeline predicting loan default risk using the [Home Credit Default Risk](https://www.kaggle.com/c/home-credit-default-risk) dataset. Built as a proper pipeline — not just a notebook — with data ingestion, multi-table feature engineering, model training, and a served prediction API.
+End-to-end ML pipeline predicting loan default risk using the [Home Credit Default Risk](https://www.kaggle.com/c/home-credit-default-risk) dataset. Built as a proper pipeline — not just a notebook — with data ingestion, multi-table feature engineering, model training, a served prediction API, and live cloud deployment.
 
 > ✅ Complete — a full end-to-end pipeline from raw multi-table data to a live, deployed prediction API.
 
 ## Stack
-Python · Pandas · NumPy · Scikit-learn · XGBoost · FastAPI · Docker · AWS
+Python · Pandas · NumPy · Scikit-learn · XGBoost · FastAPI · Docker · AWS (EC2, ECR) · GitHub Actions
 
 ## Progress
 
@@ -57,18 +57,13 @@ Python · Pandas · NumPy · Scikit-learn · XGBoost · FastAPI · Docker · AWS
 - Containerized the API with Docker for consistent, portable deployment
 - Caught and fixed a real dependency management gap: `fastapi`, `uvicorn`, and `xgboost` were installed locally but missing from `requirements.txt` — only surfaced when tested in Docker's clean environment
 
-**Day 8 — AWS Deployment**
+**Day 8 — AWS Deployment & Automation**
 - Pushed the Docker image to AWS ECR (Elastic Container Registry)
-- Deployed to a live EC2 instance, configured with proper security groups (SSH restricted to a known IP, API port open publicly)
-- Found and fixed a CPU architecture mismatch (image built for arm64, EC2 running amd64) causing `exec format error` crashes — rebuilt using `docker buildx --platform linux/amd64`
-- **API is live and publicly accessible**, verified via real HTTP requests from an external machine
-- Project complete: full pipeline from raw multi-table data to a live, deployed prediction API
-
-## Live API
-- Docs: `http://52.200.3.133:8000/docs`
-- Health check: `http://52.200.3.133:8000/health`
-
-> Note: this is a personal EC2 instance for portfolio/demo purposes and may not always be running.
+- Deployed to a live EC2 instance with properly scoped security groups (SSH restricted to a known IP, API port open publicly)
+- Found and fixed a CPU architecture mismatch (image built for arm64 on Apple Silicon, EC2 running amd64) causing `exec format error` crash loops — rebuilt using `docker buildx --platform linux/amd64`
+- Verified the API live and publicly accessible via real HTTP requests from an external machine
+- Automated instance lifecycle with GitHub Actions: scheduled start/stop workflows (3-hour daily runtime) to control costs, using a dedicated IAM user scoped to only start/stop this specific instance
+- Start workflow automatically fetches and logs the instance's current public IP after boot
 
 ## Setup
 
@@ -101,7 +96,19 @@ docker build -t credit-risk-api .
 docker run -p 8000:8000 credit-risk-api
 ```
 
+## Live API
+
+> **Note:** The EC2 instance is stopped by default to stay within AWS Free Tier limits and avoid unnecessary costs, and only runs on a scheduled basis (currently 3 hours/day) via GitHub Actions. The public IP changes on each restart — reach out if you'd like to see it live, or check the GitHub Actions run logs (`ec2-start.yml`) for the current public IP when active.
+
+## Infrastructure Automation
+
+Two GitHub Actions workflows manage the EC2 instance lifecycle:
+- `.github/workflows/ec2-start.yml` — starts the instance daily, waits for it to be running, and logs the current public IP
+- `.github/workflows/ec2-stop.yml` — stops the instance 3 hours later
+
+Both use a dedicated IAM user scoped to only start/stop this specific instance (least-privilege access), with credentials stored as encrypted GitHub Secrets.
+
 ## Possible future improvements
-- CI/CD via GitHub Actions (automated testing, linting)
-- Elastic IP for a stable, permanent address
+- Elastic IP for a permanently stable address
 - HTTPS via a reverse proxy (e.g. Nginx + Let's Encrypt)
+- CI/CD test suite (pytest) for the data pipeline
