@@ -18,3 +18,15 @@ jobs:
 
       - name: Start EC2 instance
         run: aws ec2 start-instances --instance-ids ${{ secrets.EC2_INSTANCE_ID }}
+
+      - name: Wait for instance to be running
+        run: aws ec2 wait instance-running --instance-ids ${{ secrets.EC2_INSTANCE_ID }}
+
+      - name: Get public IP
+        run: |
+          IP=$(aws ec2 describe-instances \
+            --instance-ids ${{ secrets.EC2_INSTANCE_ID }} \
+            --query 'Reservations[0].Instances[0].PublicIpAddress' \
+            --output text)
+          echo "Instance public IP: $IP"
+          echo "API docs: http://$IP:8000/docs"
